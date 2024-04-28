@@ -4,14 +4,15 @@ import config from "../utils/config";
 import { Category } from "./postgresql/entities/Category";
 import { Product } from "./postgresql/entities/Product";
 import { Reviews } from "./postgresql/entities/Reviews";
-import { Image } from "./postgresql/entities/Image";
-import { User } from "./postgresql/entities/User";
+import { User } from "../databases/postgresql/entities/User";
+import { Order } from "../databases/postgresql/entities/Order";
+import { Orderitem } from "./postgresql/entities/Orderitem";
 
 class MysqlDatabase {
   connection: DataSource;
   dataSource = new DataSource({
     ...config.mysqlConfig,
-    entities: [Category, Image, Product, Reviews, User],
+    entities: [Category, Product, Reviews, User, Order, Orderitem],
   });
   async connect(): Promise<DataSource> {
     try {

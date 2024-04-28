@@ -2,9 +2,11 @@ import {
   BaseEntity,
   Column,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Order } from "./Order";
 import { Reviews } from "./Reviews";
 
 @Entity("user", { schema: "coffee" })
@@ -24,8 +26,20 @@ export class User extends BaseEntity {
   @Column("varchar", { name: "password", length: 255 })
   password: string;
 
+  @Column("varchar", { name: "verifyEmailToken", length: 255 })
+  verifyEmailToken: string;
+
+  @Column("tinyint", { name: "isVerifyEmail", default: 0 })
+  isVerifyEmail: boolean;
+
+  @Column("varchar", { name: "img_url", length: 255 })
+  imgUrl: string;
+
   @Column("varchar", { name: "role", length: 255 })
   role: string;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   @OneToOne(() => Reviews, (reviews) => reviews.user)
   reviews: Reviews;

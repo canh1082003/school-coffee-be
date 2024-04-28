@@ -8,11 +8,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Image } from "./Image";
+import { Orderitem } from "./Orderitem";
 import { Category } from "./Category";
 import { Reviews } from "./Reviews";
 
-@Index("product_categoryid_foreign", ["categoryId"], {})
+@Index("categoryId", ["categoryId"], {})
 @Entity("product", { schema: "coffee" })
 export class Product extends BaseEntity {
   @PrimaryGeneratedColumn({ type: "int", name: "id", unsigned: true })
@@ -27,14 +27,14 @@ export class Product extends BaseEntity {
   @Column("varchar", { name: "description", length: 255 })
   description: string;
 
-  @Column("text", { name: "img" })
-  img: string;
+  @Column("text", { name: "img_url" })
+  imgUrl: string;
 
   @Column("int", { name: "categoryId", unsigned: true })
   categoryId: number;
 
-  @OneToMany(() => Image, (image) => image.product)
-  images: Image[];
+  @OneToMany(() => Orderitem, (orderitem) => orderitem.product)
+  orderitems: Orderitem[];
 
   @ManyToOne(() => Category, (category) => category.products, {
     onDelete: "NO ACTION",

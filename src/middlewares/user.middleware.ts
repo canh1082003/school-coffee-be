@@ -23,8 +23,8 @@ const RegisterMiddleware = checkSchema({
   },
   role: {
     isIn: {
-      options: ["user", "admin"],
-      errorMessage: "Role must be 'user' or 'admin'",
+      options: ["user", "admin", "shipper"],
+      errorMessage: "Role must be 'user' or 'admin' or 'shipper'",
     },
     notEmpty: { errorMessage: "Role is required" },
   },
@@ -48,5 +48,9 @@ const LoginMiddleware = checkSchema({
     },
   },
 });
-
-export { RegisterMiddleware, LoginMiddleware };
+const GetVerifyEmailTokenMiddleWare = checkSchema({
+  verifyEmailToken: {
+    notEmpty: { errorMessage: "Verify Email Token is required" },
+  },
+});
+export { RegisterMiddleware, LoginMiddleware, GetVerifyEmailTokenMiddleWare };

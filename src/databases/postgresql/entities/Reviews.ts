@@ -5,15 +5,14 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
-  PrimaryGeneratedColumn,
 } from "typeorm";
 import { Product } from "./Product";
 import { User } from "./User";
 
-@Index("reviews_productid_foreign", ["productId"], {})
+@Index("productId", ["productId"], {})
 @Entity("reviews", { schema: "coffee" })
 export class Reviews {
-  @PrimaryGeneratedColumn({ type: "int", name: "userId", unsigned: true })
+  @Column("int", { primary: true, name: "userId", unsigned: true })
   userId: number;
 
   @Column("int", { name: "productId", unsigned: true })

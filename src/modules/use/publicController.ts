@@ -1,16 +1,17 @@
 import { NextFunction, Response, Request } from "express";
-import { User } from "../../../databases/postgresql/entities/User";
-import { BadRequestErr } from "../../../exception/bad-request-error";
-import AuthErrorCode from "../../../utils/authErrorCode";
-import userService from "../../use/public/publicService";
+import { User } from "../../databases/postgresql/entities/User";
+import { BadRequestErr } from "../../exception/bad-request-error";
+import AuthErrorCode from "../../utils/authErrorCode";
+import userService from "./publicService";
 import { validationResult } from "express-validator";
 import "express-async-errors";
-import { ResponseCustom, userInfo } from "../../../utils/expressCustom";
-import { HttpStatusCode } from "../../../utils/httpStatusCode";
-import { Next } from "mysql2/typings/mysql/lib/parsers/typeCast";
-import { Unauthorized } from "../../../exception/unauthorized-error";
-import { RequestValidationError } from "../../../exception/request-validation-error";
-import { Hashing } from "../../../utils/hashing";
+import { ResponseCustom, userInfo } from "../../utils/expressCustom";
+import { HttpStatusCode } from "../../utils/httpStatusCode";
+import { Unauthorized } from "../../exception/unauthorized-error";
+import { RequestValidationError } from "../../exception/request-validation-error";
+import { Hashing } from "../../utils/hashing";
+import { sendEmail } from "../../utils/mail";
+import publicService from "./publicService";
 interface UserDto extends User {
   confirmPassword: string;
 }
@@ -40,11 +41,17 @@ class UserController {
         email,
         password,
       });
+      await sendEmail({
+        email,
+        subject: "Verify email",
+        message: `Your verify token is ${user.verifyEmailToken} `,
+      });
       return res.status(HttpStatusCode.CREATED).json({
         httpStatusCode: HttpStatusCode.CREATED,
-        data: { user },
+        data: { email: user.email },
       });
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -80,6 +87,20 @@ class UserController {
       next(error);
     }
   }
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) throw new RequestValidationError(errors.array());
+    try {
+      const { verifyEmailToken } = req.body;
+      await publicService.findAndVerifyUser(verifyEmailToken);
+      return res
+        .status(HttpStatusCode.OK)
+        .json({ message: "Verified successfully" });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
   async getAllUser(req: Request, res: Response, next: NextFunction) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) throw new RequestValidationError(errors.array());
@@ -104,6 +125,7 @@ class UserController {
         data: "Delete Success",
       });
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -115,6 +137,7 @@ class UserController {
     try {
       const { id } = req.params;
       const updatedData = req.body;
+
       const updatedUser = await userService.updateUser(Number(id), updatedData);
       return res.json({
         httpStatusCode: HttpStatusCode.OK,

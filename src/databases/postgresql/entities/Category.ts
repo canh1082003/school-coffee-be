@@ -15,9 +15,6 @@ export class Category extends BaseEntity {
   @Column("varchar", { name: "name", length: 255 })
   name: string;
 
-  @Column("text", { name: "img" })
-  img: string;
-
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 }
